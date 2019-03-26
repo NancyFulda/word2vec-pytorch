@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import init
+import numpy as np
 
 """
     u_embedding: Embedding for center word.
@@ -38,9 +39,28 @@ class SkipGramModel(nn.Module):
         return torch.mean(score + neg_score)
 
     def save_embedding(self, id2word, file_name):
+
+        #save 'IN' embeddings
         embedding = self.u_embeddings.weight.cpu().data.numpy()
-        with open(file_name, 'w') as f:
+        with open(file_name + '.IN', 'w') as f:
             f.write('%d %d\n' % (len(id2word), self.emb_dimension))
             for wid, w in id2word.items():
                 e = ' '.join(map(lambda x: str(x), embedding[wid]))
+                f.write('%s %s\n' % (w, e))
+
+        #save 'OUT' embeddings
+        embedding = self.v_embeddings.weight.cpu().data.numpy()
+        with open(file_name + '.OUT', 'w') as f:
+            f.write('%d %d\n' % (len(id2word), self.emb_dimension))
+            for wid, w in id2word.items():
+                e = ' '.join(map(lambda x: str(x), embedding[wid]))
+                f.write('%s %s\n' % (w, e))
+        
+        #save dual embeddings
+        u_embedding = self.u_embeddings.weight.cpu().data.numpy()
+        v_embedding = self.v_embeddings.weight.cpu().data.numpy()
+        with open(file_name + '.DUAL', 'w') as f:
+            f.write('%d %d\n' % (len(id2word), 2*self.emb_dimension))
+            for wid, w in id2word.items():
+                e = ' '.join(map(lambda x: str(x), np.hstack([np.array(u_embedding[wid]), np.array(v_embedding[wid])])))
                 f.write('%s %s\n' % (w, e))

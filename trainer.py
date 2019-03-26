@@ -1,7 +1,6 @@
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from data_reader import DataReader, Word2vecDataset
 from model import SkipGramModel
@@ -11,8 +10,10 @@ class Word2VecTrainer:
     def __init__(self, input_file, output_file, emb_dimension=100, batch_size=32, window_size=5, iterations=3,
                  initial_lr=0.001, min_count=12):
 
+        print("Reading input file...")
         self.data = DataReader(input_file, min_count)
         dataset = Word2vecDataset(self.data, window_size)
+        print("Creating data batches")
         self.dataloader = DataLoader(dataset, batch_size=batch_size,
                                      shuffle=False, num_workers=0, collate_fn=dataset.collate)
 
@@ -38,7 +39,13 @@ class Word2VecTrainer:
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, len(self.dataloader))
 
             running_loss = 0.0
-            for i, sample_batched in enumerate(tqdm(self.dataloader)):
+            count = 0
+
+            for i, sample_batched in enumerate(self.dataloader):
+
+                count += 1
+                if count%10000 == 0:
+                    print("\n\nEpoch %d, %d batches processed" % (iteration, count))
 
                 if len(sample_batched[0]) > 1:
                     pos_u = sample_batched[0].to(self.device)
@@ -59,5 +66,6 @@ class Word2VecTrainer:
 
 
 if __name__ == '__main__':
-    w2v = Word2VecTrainer(input_file="input.txt", output_file="out.vec")
+    #w2v = Word2VecTrainer(input_file="input.txt", output_file="embeddings.vec")
+    w2v = Word2VecTrainer(input_file="data/Wikipedia_text_with_periods.txt", output_file="out.vec")
     w2v.train()
