@@ -33,6 +33,7 @@ class DataReader:
                 self.sentences_count += 1
                 for word in line:
                     if len(word) > 0:
+                        word = word.strip('.?!;:-')
                         self.token_count += 1
                         word_frequency[word] = word_frequency.get(word, 0) + 1
 
@@ -40,7 +41,7 @@ class DataReader:
                             print("Read " + str(int(self.token_count / 1000000)) + "M words.")
 
         wid = 0
-        for w, c in word_frequency.items():
+        for w, c in sorted(word_frequency.items(), key=lambda x: x[1]):
             if c < min_count:
                 continue
             self.word2id[w] = wid
