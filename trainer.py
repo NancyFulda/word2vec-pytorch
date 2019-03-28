@@ -67,5 +67,7 @@ class Word2VecTrainer:
 
 if __name__ == '__main__':
     #w2v = Word2VecTrainer(input_file="input.txt", output_file="embeddings.vec")
-    w2v = Word2VecTrainer(input_file="data/Wikipedia_text_with_periods.txt", output_file="out.vec")
+    w2v = Word2VecTrainer(input_file="data/Wikipedia_first_10000_lines.txt", output_file="junk.vec")
+    #w2v = Word2VecTrainer(input_file="data/Wikipedia_text_with_periods.txt", output_file="out_3.vec", iterations=3, min_count=50)
+    #w2v = Word2VecTrainer(input_file="data/Wikipedia_text_with_periods.txt", output_file="out_1_Sorted.vec", iterations=1, min_count=50)
     w2v.train()

@@ -64,3 +64,12 @@ class SkipGramModel(nn.Module):
             for wid, w in id2word.items():
                 e = ' '.join(map(lambda x: str(x), np.hstack([np.array(u_embedding[wid]), np.array(v_embedding[wid])])))
                 f.write('%s %s\n' % (w, e))
+        
+
+        #save mul embeddings
+        embeddings = torch.mul(self.u_embeddings.weight, self.v_embeddings.weight).cpu().data.numpy()
+        with open(file_name + '.MUL', 'w') as f:
+            f.write('%d %d\n' % (len(id2word), 2*self.emb_dimension))
+            for wid, w in id2word.items():
+                e = ' '.join(map(lambda x: str(x), embedding[wid]))
+                f.write('%s %s\n' % (w, e))

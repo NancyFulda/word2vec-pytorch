@@ -14,7 +14,11 @@ def load_embeddings(filename="out.vec"):
     return embeddings_dict
 
 def closest_words(vec, tokens, vectors, n=5):
-    distances = 1 - np.dot(vectors,vec.T)/np.linalg.norm(vec)
+    #this doesn't work because the vectors aren't normalized
+    #distances = 1 - np.dot(vectors,vec.T)/(np.linalg.norm(vectors) * np.linalg.norm(vec))
+
+    #but this does
+    distances = spatial.distance.cdist(vectors, [vec], metric='cosine')
 
     closest_words = []
     for i in range(n):
@@ -39,7 +43,12 @@ def test_analogy(words, embeddings_dict, n=5):
 
 def find_closest_point(vec, tokens, vectors):
 
-    distances = 1 - np.dot(vectors,vec.T)/np.linalg.norm(vec)
+    #this doesn't work because vectors are not normalized
+    #distances = 1 - np.dot(vectors,vec.T)/np.linalg.norm(vec)
+
+    #but this does
+    distances = spatial.distance.cdist(vectors, [vec], metric='cosine')
+
     min_dist = np.nanmin(distances)
     index = np.where(distances == min_dist)[0][0]
     closest_word = tokens[index]
@@ -117,8 +126,8 @@ def run_evaluations(embeddings_dict, tokens, vectors):
     for f in filenames:
         print('\n loading %s' % (f))
         embeddings = load_embeddings(f)
-        tokens = sorted(embeddings_dict.keys())
-        vectors = [embeddings_dict[key] for key in sorted(embeddings_dict.keys())]
+        tokens = embeddings_dict.keys()
+        vectors = [embeddings_dict[key] for key in embeddings_dict.keys()]
         run_google_evaluation(embeddings, tokens, vectors)
         run_BATS_evaluation(embeddings, tokens, vectors)
         run_SAT_evaluation(embeddings, tokens, vectors)
