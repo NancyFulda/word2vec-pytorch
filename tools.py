@@ -62,6 +62,11 @@ def compute_analogy(v, tokens, vectors):
     filtered_tokens = tokens[:]
     filtered_vectors = vectors[:]
     for i in range(3):
+        #whr = np.where(filtered_vectors == v[i])
+        #print(whr)
+        #print(filtered_vectors[0].shape)
+        #print(type(filtered_vectors[0]))
+        #input('>')
         index = np.where(filtered_vectors == v[i])[0][0]
         del filtered_tokens[index]
         del filtered_vectors[index]
@@ -103,14 +108,14 @@ def run_google_evaluation(embeddings_dict, tokens, vectors):
         total_correct += num_correct
         total_count += count
         total_omitted += num_omitted
-        print('num correct %d/%d' % (num_correct, count))
+        print('num correct %d/%d, %f' % (num_correct, count, float(num_correct)/count))
 
-        results_dict[data[0]] = str(num_correct) + ' correct, ' + str(count) + ' total, ' + str(100 * num_correct/count) + '%, omitted ' + str(num_omitted)
+        results_dict[data[0]] = str(num_correct) + ' correct, ' + str(count) + ' total, ' + str(100 * float(num_correct)/count) + '%, omitted ' + str(num_omitted)
 
     print('\n\nGOOGLE ANALOGY TEST SET')
     pp = pprint.PrettyPrinter()
     pp.pprint(results_dict)
-    print('Composite %.2f%s' % (100 * total_correct/total_count, '%'))
+    print('Composite %f%s' % (100 * float(total_correct)/total_count, '%'))
     print('Omissions %d' % (total_omitted))
 
 def run_BATS_evaluation(embeddings_dict, tokens, vectors):
@@ -133,9 +138,10 @@ def run_evaluations(embeddings_dict, tokens, vectors):
         run_SAT_evaluation(embeddings, tokens, vectors)
 
 if __name__=='__main__':
-    embeddings_dict = load_embeddings('out.vec.IN')
+    #embeddings_dict = load_embeddings('bse_vectors_DIM_50_window_5_small_corpus/out_iterations_5.vec.ADD.SIF')
+    embeddings_dict = load_embeddings('bse_constraint_vectors_window_5/out_iterations_2_cleaned.vec.OUT.SIF')
     tokens = list(embeddings_dict.keys())
     vectors = [embeddings_dict[key] for key in tokens]
-    short_tokens = tokens[:10000]
-    short_vectors = vectors[:10000]
-    run_google_evaluation(embeddings_dict, short_tokens, short_vectors)
+    #tokens = tokens[:10000]
+    #vectors = vectors[:10000]
+    run_google_evaluation(embeddings_dict, tokens, vectors)
